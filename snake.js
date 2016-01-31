@@ -17,8 +17,6 @@ $(function() {
   var starRemoveTimeout;
   //durations, e.g. move the snake every tick ms
   var tick;
-  var drawStarEvery;
-  var keepStarFor;
 
   //settings
   //FEATURE compute max-gridSize from viewport?
@@ -41,10 +39,6 @@ $(function() {
     y: 0
   };
   var initialTick = 250;
-  //FEATURE maybe we should determine drawStarEvery from tick and grid size,
-  //e.g. how long it takes to cross the field once
-  var initialDrawStarEvery = 6000;
-  //keepStar equals drawStarEvery * 0.8
 
   //setting up the game
   function initialize() {
@@ -52,8 +46,6 @@ $(function() {
     firstStar = true;
     snake = [];
     tick = initialTick;
-    drawStarEvery = initialDrawStarEvery;
-    keepStarFor = drawStarEvery * 0.8;
 
     positionHead.x = initialPositionHead.x;
     positionHead.y = initialPositionHead.y;
@@ -307,7 +299,7 @@ $(function() {
     setStarCoordinates(starContainer);
     star.active = true;
 
-    starRemoveTimeout = setTimeout(removeStar, keepStarFor);
+    starRemoveTimeout = setTimeout(removeStar, keepStarTick());
   }
 
   function setStarCoordinates(starContainer) {
@@ -316,8 +308,16 @@ $(function() {
     setCSSCoordinates(starContainer, gridToCSS(star));
   }
 
+  function drawStarTick() {
+    return tick * (gridSize.x + gridSize.y);
+  }
+
+  function keepStarTick() {
+    return drawStarTick() * 0.8;
+  }
+
   function startDrawingStars() {
-    starInterval = setInterval(drawStar, drawStarEvery);
+    starInterval = setInterval(drawStar, drawStarTick());
   }
 
   function stopDrawingStars() {

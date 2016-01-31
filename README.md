@@ -8,7 +8,7 @@ Use the arrow keys to navigate and start the game. The space bar can be
 used for pause/continue. Restart the game with the 'Restart'-button or
 (when the game is lost) with hitting enter.
 
-You can increase (decrease) the speed with +(-).
+You can increase (decrease) the speed with + (-).
 
 ## TODOs
 

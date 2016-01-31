@@ -86,7 +86,7 @@ $(function() {
     })
 
     if(i === 0) {
-      bodyPart.css(gridToCSS(positionHead));
+      setCSSCoordinates(bodyPart, gridToCSS(positionHead));
     } else {
       //take the coordinates from the previous element
       previousCoordinates = getCSSCoordinates(snake[i - 1]);

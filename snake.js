@@ -97,6 +97,7 @@ $(function() {
   }
 
   function moveSnake() {
+    //REFACTOR this function is a mess
     positionHead.x += direction.x;
     positionHead.y += direction.y;
 

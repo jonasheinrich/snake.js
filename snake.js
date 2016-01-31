@@ -1,6 +1,6 @@
 $(function() {
-  //TODO high-score
-  //input for gridSize, blockSize, speed (tick) etc?
+  //FEATURE high-score
+  //FEATURE input for gridSize, blockSize, speed (tick) etc?
   //attributes
   var snake;
   var positionHead = {};
@@ -21,7 +21,7 @@ $(function() {
   var keepStarFor;
 
   //settings
-  //TODO compute max-gridSize from viewport?
+  //FEATURE compute max-gridSize from viewport?
   var gridSize = {
     x: 12,
     y: 10
@@ -41,7 +41,7 @@ $(function() {
     y: 0
   };
   var initialTick = 250;
-  //TODO maybe we should determine drawStarEvery from tick and grid size,
+  //FEATURE maybe we should determine drawStarEvery from tick and grid size,
   //e.g. how long it takes to cross the field once
   var initialDrawStarEvery = 6000;
   //keepStar equals drawStarEvery * 0.8
@@ -209,7 +209,7 @@ $(function() {
       blinkHead();
       return;
     }
-    //TODO the repeated assignment of steeredAlready is annoying
+    //REFACTOR the repeated assignment of steeredAlready is annoying
     if(e.which == '37'
        && direction.x !== 1) {
       direction = {

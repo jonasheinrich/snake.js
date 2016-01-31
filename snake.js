@@ -1,21 +1,26 @@
 $(function() {
   //FEATURE high-score
   //FEATURE input for gridSize, blockSize, speed (tick) etc?
+
   //attributes
   var snake;
   var positionHead = {};
   var direction = {};
+  var star = {
+    active: false
+  }
+
   //states
   var isMoving;
   var lostAlready;
   var steeredAlready;
   var firstStar;
+
   //Intervals and Timeouts
   var starFirstTimeout;
   var moveInterval;
   var starInterval;
   var starRemoveTimeout;
-  //durations, e.g. move the snake every tick ms
   var tick;
 
   //settings
@@ -26,7 +31,7 @@ $(function() {
   };
   var blockSize = 60;
 
-  //start variables
+  //initial settings
   var initialSnakeLength = 3;
   var initialX = Math.floor(gridSize.x/2);
   var initialY = Math.floor(gridSize.y/2);
@@ -40,7 +45,9 @@ $(function() {
   };
   var initialTick = 250;
 
-  //setting up the game
+  //-------------------------------------------------------
+  //---------- setting up the game ------------------------
+  //-------------------------------------------------------
   function initialize() {
     lostAlready = false;
     firstStar = true;
@@ -58,15 +65,17 @@ $(function() {
       width: width,
       height: height
     })
-    hideLostMessage();
     container.html('');
-    for(var i = 0; i < initialSnakeLength; i++) {
-      addBodyPart();
-    }
+    for(var i = 0; i < initialSnakeLength; i++) addBodyPart();
+
+    createLostMessage();
+    hideLostMessage();
   }
-  createLostMessage();
   initialize();
 
+  //-------------------------------------------------------
+  //---------- handling the snake ----------------------------
+  //-------------------------------------------------------
   function addBodyPart() {
     var i = snake.length;
     bodyPart = $('<div id="body-' + i + '" class="body-part"></div>').appendTo(container);
@@ -85,16 +94,6 @@ $(function() {
     }
 
     snake.push(bodyPart);
-  }
-
-  function gridToCSS(gridPosition) {
-    leftValue = gridPosition.x * blockSize;
-    topValue = gridPosition.y * blockSize;
-    cssPosition = {
-      left: leftValue,
-      top: topValue
-    }
-    return cssPosition
   }
 
   function moveSnake() {
@@ -129,26 +128,30 @@ $(function() {
     steeredAlready = false;
   }
 
+  function startMoving() {
+    if (firstStar) {
+      starFirstTimeout = setTimeout(drawStar, 2000);
+      firstStar = false;
+    }
+    isMoving = true;
+    moveInterval = setInterval(moveSnake, tick);
+    startDrawingStars();
+  }
+
+  function stopMoving() {
+    clearInterval(moveInterval);
+    stopDrawingStars();
+    clearTimeout(starRemoveTimeout);
+    isMoving = false;
+  }
+
   function reddenHead() {
     snake[0].css('background-color', 'BD5555');
   }
 
-  $('#retry').click(initialize);
-
-  function createLostMessage() {
-    lostMessage = $('#lost')
-    if (lostMessage.length == 0) {
-      lostMessage = $('<div id="lost"></div>').prependTo($('#lost-container'));
-    }
-    lostMessage.text("Sorry, but you lost!");
-  }
-
-  function showLostMessage() {
-    $('#lost').css({visibility: 'visible'});
-  }
-
-  function hideLostMessage() {
-    $('#lost').css({visibility: 'hidden'});
+  function blinkHead() {
+    snake[0].css('background-color', 'DDD')
+    setTimeout(function() {snake[0].css('background-color', '')}, 150);
   }
 
   function hitWall() {
@@ -170,6 +173,10 @@ $(function() {
     return positionHead.x === star.x && positionHead.y === star.y
   }
 
+  function moveHead() {
+    setCSSCoordinates(snake[0], gridToCSS(positionHead));
+  }
+
   function overlapsBody(gridPosition) {
     for(var i = 1; i < snake.length; i++) {
       cssCoordinates = gridToCSS(gridPosition);
@@ -180,21 +187,28 @@ $(function() {
     return false
   }
 
-  function moveHead() {
-    setCSSCoordinates(snake[0], gridToCSS(positionHead));
+  //-------------------------------------------------------
+  //---------- menu on the left ---------------------------
+  //-------------------------------------------------------
+  function createLostMessage() {
+    lostMessage = $('#lost')
+    if (lostMessage.length == 0) {
+      lostMessage = $('<div id="lost"></div>').prependTo($('#lost-container'));
+    }
+    lostMessage.text("Sorry, but you lost!");
   }
 
-  function setCSSCoordinates(element, coordObj) {
-    element.css(coordObj);
+  function showLostMessage() {
+    $('#lost').css({visibility: 'visible'});
   }
 
-  function getCSSCoordinates(element) {
-    var coordinates = {};
-    coordinates.top = element.css('top');
-    coordinates.left = element.css('left');
-    return coordinates;
+  function hideLostMessage() {
+    $('#lost').css({visibility: 'hidden'});
   }
 
+  //-------------------------------------------------------
+  //---------- controls -----------------------------------
+  //-------------------------------------------------------
   function steerSnake(e) {
     if (lostAlready) return
     if (steeredAlready) {
@@ -233,11 +247,6 @@ $(function() {
     }
   }
   $(document).keydown(steerSnake);
-
-  function blinkHead() {
-    snake[0].css('background-color', 'DDD')
-    setTimeout(function() {snake[0].css('background-color', '')}, 150);
-  }
 
   function startAndStopSnake(e) {
     // start and pause with space
@@ -281,10 +290,11 @@ $(function() {
   }
   $(document).keydown(setSpeed);
 
-  var star = {
-    active: false
-  }
+  $('#retry').click(initialize);
 
+  //-------------------------------------------------------
+  //---------- handling the stars -------------------------
+  //-------------------------------------------------------
   function drawStar() {
     clearTimeout(starRemoveTimeout);
     do {
@@ -351,20 +361,27 @@ $(function() {
     startDrawingStars();
   }
 
-  function startMoving() {
-    if (firstStar) {
-      starFirstTimeout = setTimeout(drawStar, 2000);
-      firstStar = false;
+  //-------------------------------------------------------
+  //---------- utility functions --------------------------
+  //-------------------------------------------------------
+  function gridToCSS(gridPosition) {
+    leftValue = gridPosition.x * blockSize;
+    topValue = gridPosition.y * blockSize;
+    cssPosition = {
+      left: leftValue,
+      top: topValue
     }
-    isMoving = true;
-    moveInterval = setInterval(moveSnake, tick);
-    startDrawingStars();
+    return cssPosition
   }
 
-  function stopMoving() {
-    clearInterval(moveInterval);
-    stopDrawingStars();
-    clearTimeout(starRemoveTimeout);
-    isMoving = false;
+  function setCSSCoordinates(element, coordObj) {
+    element.css(coordObj);
+  }
+
+  function getCSSCoordinates(element) {
+    var coordinates = {};
+    coordinates.top = element.css('top');
+    coordinates.left = element.css('left');
+    return coordinates;
   }
 });

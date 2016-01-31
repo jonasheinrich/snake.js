@@ -30,9 +30,11 @@ $(function() {
 
   //start variables
   var initialSnakeLength = 3;
+  var initialX = Math.floor(gridSize.x/2);
+  var initialY = Math.floor(gridSize.y/2);
   var initialPositionHead = {
-    x: 6,
-    y: 5
+    x: initialX,
+    y: initialY
   }
   var initialDirection = {
     x: 0,

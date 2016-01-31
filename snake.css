@@ -8,8 +8,6 @@ body {
   border-radius: 4px;
   background-color: #CCCCCC;
   top: 50%;
-  /*transform: translateY(-50%);*/
-  /*position: relative;*/
   justify-content: center;
   align-items: center;
   display: flex;
@@ -58,5 +56,4 @@ body {
 
 #star {
   text-align: center;
-  vertical-align: middle;/*does not work*/
 }

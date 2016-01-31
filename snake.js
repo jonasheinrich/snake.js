@@ -293,16 +293,11 @@ $(function() {
 
   function drawStar() {
     clearTimeout(starRemoveTimeout);
-    //TODO seems like sometimes the star gets drawn on the snake body..
-    //maybe because the star is drawn in between the drawing of
-    //two body parts?
-    //or it is because we only check if the star overlaps the body,
-    //not if it overlaps the head..
     do {
       star.x = Math.floor(Math.random() * (gridSize.x -1));
       star.y = Math.floor(Math.random() * (gridSize.y - 1));
     }
-    while (overlapsBody(star))
+    while (overlapsBody(star) || hitStar())
 
     starContainer = $('#star-container');
     if (starContainer.length === 0) starContainer = createStarContainer();

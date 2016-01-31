@@ -42,7 +42,7 @@ body {
 }
 
 #lost {
-  line-height: 2em;
+  padding: 10px;
 }
 
 #retry {

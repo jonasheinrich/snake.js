@@ -1,7 +1,6 @@
 $(function() {
-  //TODO get clear about the usage of snake[0] or $('#body-0')
   //TODO high-score
-  //input for gridSize, blockSize, tick etc?
+  //input for gridSize, blockSize, speed (tick) etc?
   //attributes
   var snake;
   var positionHead = {};
@@ -22,7 +21,7 @@ $(function() {
   var keepStarFor;
 
   //settings
-  //TODO max-gridSize?
+  //TODO compute max-gridSize from viewport?
   var gridSize = {
     x: 12,
     y: 10
@@ -40,6 +39,8 @@ $(function() {
     y: 0
   };
   var initialTick = 250;
+  //TODO maybe we should determine drawStarEvery from tick and grid size,
+  //e.g. how long it takes to cross the field once
   var initialDrawStarEvery = 6000;
   //keepStar equals drawStarEvery * 0.8
 
@@ -63,7 +64,7 @@ $(function() {
       width: width,
       height: height
     })
-    clearLostMessage();
+    hideLostMessage();
     container.html('');
     for(var i = 0; i < initialSnakeLength; i++) {
       addBodyPart();
@@ -77,20 +78,16 @@ $(function() {
     bodyPart = $('<div id="body-' + i + '" class="body-part"></div>').appendTo(container);
     bodyPart.css({
       width: blockSize,
-      height: blockSize
+      height: blockSize,
+      position: 'absolute'
     })
-    bodyPart.css({position: 'absolute'})
 
     if(i === 0) {
       bodyPart.css(gridToCSS(positionHead));
     } else {
       //take the coordinates from the previous element
-      topValue = snake[i - 1].css('top');
-      leftValue = snake[i - 1].css('left');
-      bodyPart.css({
-        top: topValue,
-        left: leftValue
-      });
+      previousCoordinates = getCSSCoordinates(snake[i - 1]);
+      setCSSCoordinates(bodyPart, previousCoordinates);
     }
 
     snake.push(bodyPart);
@@ -114,42 +111,32 @@ $(function() {
       stopMoving();
       lostAlready = true;
       reddenHead();
-      writeLostMessage();
+      showLostMessage();
       return
     }
 
     if (hitStar()) eatStar();
 
-    //TODO duplicated code (see addBodyPart)
-    //TODO don't use overkill object here, just topValuePrevious
-    topValue = snake[0].css('top');
-    leftValue = snake[0].css('left');
-    previousElementBeforeMove = {
-      top: topValue,
-      left: leftValue
-    };
-
+    var previousElementCoordinates = getCSSCoordinates(snake[0]);
     moveHead();
 
     for(var i = 1; i < snake.length; i++) {
-      topValue = snake[i].css('top');
-      leftValue = snake[i].css('left');
-      if (previousElementBeforeMove.top === topValue && previousElementBeforeMove.left === leftValue ) continue;
-      topValue = previousElementBeforeMove.top;
-      leftValue = previousElementBeforeMove.left;
-      //TODO code dupliation
-      previousElementBeforeMove.top = snake[i].css('top');
-      previousElementBeforeMove.left = snake[i].css('left');
-      snake[i].css({
-        top: topValue,
-        left: leftValue
-      });
+      currentElementCoordinates = getCSSCoordinates(snake[i]);
+      //skip if the previous element has been overlapping this one
+      //i.e. at the start or when adding body parts
+      if (previousElementCoordinates.top === currentElementCoordinates.top
+          && previousElementCoordinates.left === currentElementCoordinates.left ) continue;
+
+      currentElementCoordinates.top = previousElementCoordinates.top;
+      currentElementCoordinates.left = previousElementCoordinates.left;
+      previousElementCoordinates = getCSSCoordinates(snake[i]);
+      setCSSCoordinates(snake[i], currentElementCoordinates);
     }
     steeredAlready = false;
   }
 
   function reddenHead() {
-    $('#body-0').css('background-color', 'BD5555');
+    snake[0].css('background-color', 'BD5555');
   }
 
   $('#retry').click(initialize);
@@ -162,11 +149,11 @@ $(function() {
     lostMessage.text("Sorry, but you lost!");
   }
 
-  function writeLostMessage() {
+  function showLostMessage() {
     $('#lost').css({visibility: 'visible'});
   }
 
-  function clearLostMessage() {
+  function hideLostMessage() {
     $('#lost').css({visibility: 'hidden'});
   }
 
@@ -191,16 +178,27 @@ $(function() {
 
   function overlapsBody(gridPosition) {
     for(var i = 1; i < snake.length; i++) {
-      //TODO code duplication?
-      calculatedGridPosition = gridToCSS(gridPosition);
-      if ( calculatedGridPosition.top + 'px' == snake[i].css('top')
-          && calculatedGridPosition.left + 'px' == snake[i].css('left')) return true
+      cssCoordinates = gridToCSS(gridPosition);
+      bodyPartCoordinates = getCSSCoordinates(snake[i]);
+      if ( cssCoordinates.top + 'px' == bodyPartCoordinates.top
+          && cssCoordinates.left + 'px' == bodyPartCoordinates.left) return true
     }
     return false
   }
 
   function moveHead() {
-    $('#body-0').css(gridToCSS(positionHead));
+    setCSSCoordinates(snake[0], gridToCSS(positionHead));
+  }
+
+  function setCSSCoordinates(element, coordObj) {
+    element.css(coordObj);
+  }
+
+  function getCSSCoordinates(element) {
+    var coordinates = {};
+    coordinates.top = element.css('top');
+    coordinates.left = element.css('left');
+    return coordinates;
   }
 
   function steerSnake(e) {
@@ -257,7 +255,7 @@ $(function() {
       } else {
         startMoving();
       }
-      //TODO stop default event
+      e.preventDefault();
     }
     // start with arrows
     if ([37, 38, 39, 40].indexOf(e.which) !== -1
@@ -274,7 +272,6 @@ $(function() {
   }
   $(document).keydown(reinitialize);
 
-  //TODO button for setting speed?
   function setSpeed(e) {
     if (e.which === 187) {
       tick /= 2;
@@ -299,6 +296,8 @@ $(function() {
     //TODO seems like sometimes the star gets drawn on the snake body..
     //maybe because the star is drawn in between the drawing of
     //two body parts?
+    //or it is because we only check if the star overlaps the body,
+    //not if it overlaps the head..
     do {
       star.x = Math.floor(Math.random() * (gridSize.x -1));
       star.y = Math.floor(Math.random() * (gridSize.y - 1));
@@ -317,10 +316,7 @@ $(function() {
   function setStarCoordinates(starContainer) {
     topValue = gridToCSS(star).top;
     leftValue = gridToCSS(star).left;
-    starContainer.css({
-      top: topValue,
-      left: leftValue
-    });
+    setCSSCoordinates(starContainer, gridToCSS(star));
   }
 
   function startDrawingStars() {

@@ -307,16 +307,10 @@ $(function() {
     starContainer = $('#star-container');
     if (starContainer.length === 0) starContainer = createStarContainer();
     starContainer.css('visibility', 'visible');
-    setStarCoordinates(starContainer);
+    setCSSCoordinates(starContainer, gridToCSS(star));
     star.active = true;
 
     starRemoveTimeout = setTimeout(removeStar, keepStarTick());
-  }
-
-  function setStarCoordinates(starContainer) {
-    topValue = gridToCSS(star).top;
-    leftValue = gridToCSS(star).left;
-    setCSSCoordinates(starContainer, gridToCSS(star));
   }
 
   function drawStarTick() {

@@ -2,15 +2,15 @@ $(function() {
   //FEATURE high-score
   //FEATURE input for gridSize, blockSize, speed (tick) etc?
 
-  //attributes
+  //models
   var snake;
-  var positionHead = {};
-  var direction = {};
   var star = {
     active: false
   }
 
   //states
+  var positionHead = {};
+  var direction = {};
   var isMoving;
   var lostAlready;
   var steeredAlready;

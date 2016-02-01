@@ -177,16 +177,6 @@ $(function() {
     setCSSCoordinates(snake[0], gridToCSS(positionHead));
   }
 
-  function overlapsBody(gridPosition) {
-    for(var i = 1; i < snake.length; i++) {
-      cssCoordinates = gridToCSS(gridPosition);
-      bodyPartCoordinates = getCSSCoordinates(snake[i]);
-      if ( cssCoordinates.top + 'px' == bodyPartCoordinates.top
-          && cssCoordinates.left + 'px' == bodyPartCoordinates.left) return true
-    }
-    return false
-  }
-
   //-------------------------------------------------------
   //---------- menu on the left ---------------------------
   //-------------------------------------------------------
@@ -358,6 +348,16 @@ $(function() {
   //-------------------------------------------------------
   //---------- utility functions --------------------------
   //-------------------------------------------------------
+  function overlapsBody(gridPosition) {
+    for(var i = 1; i < snake.length; i++) {
+      cssCoordinates = gridToCSS(gridPosition);
+      bodyPartCoordinates = getCSSCoordinates(snake[i]);
+      if ( cssCoordinates.top + 'px' == bodyPartCoordinates.top
+          && cssCoordinates.left + 'px' == bodyPartCoordinates.left) return true
+    }
+    return false
+  }
+
   function gridToCSS(gridPosition) {
     leftValue = gridPosition.x * blockSize;
     topValue = gridPosition.y * blockSize;

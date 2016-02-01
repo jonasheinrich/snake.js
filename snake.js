@@ -68,7 +68,6 @@ $(function() {
     container.html('');
     for(var i = 0; i < initialSnakeLength; i++) addBodyPart();
 
-    createLostMessage();
     hideLostMessage();
   }
   initialize();
@@ -180,14 +179,6 @@ $(function() {
   //-------------------------------------------------------
   //---------- menu on the left ---------------------------
   //-------------------------------------------------------
-  function createLostMessage() {
-    lostMessage = $('#lost')
-    if (lostMessage.length == 0) {
-      lostMessage = $('<div id="lost"></div>').prependTo($('#lost-container'));
-    }
-    lostMessage.text("Sorry, but you lost!");
-  }
-
   function showLostMessage() {
     $('#lost').css({visibility: 'visible'});
   }

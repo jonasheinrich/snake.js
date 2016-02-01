@@ -7,11 +7,9 @@ body {
   border: solid 2px #666666;
   border-radius: 4px;
   background-color: #CCCCCC;
-  top: 50%;
   justify-content: center;
   align-items: center;
   display: flex;
-  margin: auto;
   padding: 20px;
 }
 
@@ -20,7 +18,6 @@ body {
   border-radius: 4px;
   background-color: #DDDDDD;
   position: relative;
-  margin: auto;
   flex-shrink: 0;
 }
 
@@ -28,11 +25,10 @@ body {
   border: solid 1px #666666;
   border-radius: 4px;
   background-color: #444444;
+  position: absolute;
 }
 
 #navigation {
-  position: relative;
-  rightt: 300px;
   width: 20%;
   padding: 20px;
 }

@@ -81,8 +81,7 @@ $(function() {
     bodyPart = $('<div id="body-' + i + '" class="body-part"></div>').appendTo(container);
     bodyPart.css({
       width: blockSize,
-      height: blockSize,
-      position: 'absolute'
+      height: blockSize
     })
 
     if(i === 0) {

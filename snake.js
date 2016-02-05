@@ -94,7 +94,7 @@ $(function() {
   }
 
   function setPlayingFieldSetting(settingInputElement) {
-    //TODO there probably is a smarter way to do this
+    //REFACTOR there probably is a smarter way to do this
     //maybe via a setting object and calling setting[this.data('setting')]?
     if(settingInputElement.attr('id') === 'grid-size-x-range') {
       gridSize.x = settingInputElement.val();

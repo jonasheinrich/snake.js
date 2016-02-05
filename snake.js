@@ -1,12 +1,11 @@
 $(function() {
   //FEATURE high-score
-  //FEATURE input for gridSize, blockSize, speed (tick) etc?
 
   //models
   var snake;
   var star = {
     active: false
-  }
+  };
 
   //states
   var positionHead = {};
@@ -21,15 +20,15 @@ $(function() {
   var moveInterval;
   var starInterval;
   var starRemoveTimeout;
-  var tick;
+  var tick = 250;
 
   //settings
-  //FEATURE compute max-gridSize from viewport?
   var gridSize = {
     x: 12,
     y: 10
   };
   var blockSize = 60;
+  var speedFactor = 1;
 
   //initial settings
   var initialSnakeLength = 3;
@@ -38,46 +37,153 @@ $(function() {
   var initialPositionHead = {
     x: initialX,
     y: initialY
-  }
+  };
   var initialDirection = {
     x: 0,
     y: 0
   };
-  var initialTick = 250;
+
+  //-------------------------------------------------------
+  //---------- handling the settings ----------------------
+  //-------------------------------------------------------
+
+  //TODO use the calculated width of the parent container
+  var marginX = 370;
+  var marginY = 50;
+  function initializeSettings() {
+    setMaxGridValues();
+
+    setMaxBoxSizeValues();
+  }
+  initializeSettings();
+
+  //TODO resizing and starting with a viewport different than mine does not work
+  //I could also do it with this:
+  //http://stackoverflow.com/a/5926068
+  //$(window).resize(initializeSettings);
+
+  function setMaxGridValues() {
+    maxGridSizeX = maxGridSize(window.innerWidth, marginX);
+    if (gridSize.x > maxGridSizeX) gridSize.x = maxGridSizeX;
+    setMaxValue('#grid-size-x-range', maxGridSizeX);
+    maxGridSizeY = maxGridSize(window.innerHeight, marginY);
+    if (gridSize.y > maxGridSizeY) gridSize.y = maxGridSizeY;
+    setMaxValue('#grid-size-y-range', maxGridSizeY);
+  }
+
+  function setMaxBoxSizeValues() {
+    maxBoxSize = getMaxBoxSize();
+    setMaxValue('#block-size-range', maxBoxSize);
+  }
+
+  function maxGridSize(pixels, margin) {
+    return Math.floor(maxPlayingFieldSize(pixels, margin) / blockSize);
+  }
+
+  function maxPlayingFieldSize(pixels, margin) {
+    return pixels - margin;
+  }
+
+  function setMaxValue(range, value) {
+    $(range).attr('max', value);
+  }
+
+  function getMaxBoxSize() {
+    return Math.floor(Math.min(maxPlayingFieldSize(window.innerWidth, marginX) / gridSize.x / 10,
+                               maxPlayingFieldSize(window.innerHeight, marginY) / gridSize.y / 10)) * 10;
+  }
+
+  function setPlayingFieldSetting(settingInputElement) {
+    //TODO there probably is a smarter way to do this
+    //maybe via a setting object and calling setting[this.data('setting')]?
+    if(settingInputElement.attr('id') === 'grid-size-x-range') {
+      gridSize.x = settingInputElement.val();
+      setMaxBoxSizeValues();
+    } else if (settingInputElement.attr('id') === 'grid-size-y-range') {
+      gridSize.y = settingInputElement.val();
+      setMaxBoxSizeValues();
+    } else if (settingInputElement.attr('id') === 'block-size-range') {
+      blockSize = settingInputElement.val();
+      setMaxGridValues();
+    }
+
+    drawPlayingField();
+    initializeGame();
+  }
+
+  $('#playing-field-settings').find('input[type=range]').change(function() {
+    setPlayingFieldSetting($(this));
+    printValue($(this), $($(this).data('textfield')));
+  });
+
+  function setSpeedFactor() {
+    var exponent = $(this).val();
+    speedFactor = Math.round(Math.pow(2, exponent)*100)/100;
+    $('#speed-text').text(speedFactor);
+
+    //restart Snake to apply new speed
+    if (isMoving) {
+      stopMoving();
+      startMoving();
+    }
+  }
+  $('#speed-range').change(setSpeedFactor);
+
+  function setSpeedFromKeys(e) {
+    if (e.which === 187
+        || e.which === 189) {
+      speedRange = $('#speed-range');
+      speedExponent = speedRange.val();
+      speedRange.val(parseInt(speedExponent) - e.which + 188);
+      speedRange.change();
+    }
+  }
+  $(document).keydown(setSpeedFromKeys);
 
   //-------------------------------------------------------
   //---------- setting up the game ------------------------
   //-------------------------------------------------------
-  function initialize() {
-    lostAlready = false;
-    firstStar = true;
-    snake = [];
-    tick = initialTick;
 
-    positionHead.x = initialPositionHead.x;
-    positionHead.y = initialPositionHead.y;
-    direction.x = initialDirection.x;
-    direction.y = initialDirection.y;
-    var container = $('#container');
+  function drawPlayingField() {
+    var container = $('#playing-field');
     width = gridSize.x * blockSize;
     height = gridSize.y * blockSize;
     container.css({
       width: width,
       height: height
     })
+  }
+  drawPlayingField();
+
+  function initializeGame() {
+    lostAlready = false;
+    firstStar = true;
+    snake = [];
+
+    positionHead.x = initialPositionHead.x;
+    while (positionHead.x >= gridSize.x) {
+      positionHead.x = Math.round(positionHead.x/2);
+    }
+    positionHead.y = initialPositionHead.y;
+    while (positionHead.y >= gridSize.y) {
+      positionHead.y = Math.round(positionHead.y/2);
+    }
+    direction.x = initialDirection.x;
+    direction.y = initialDirection.y;
+    var container = $('#playing-field');
     container.html('');
     for(var i = 0; i < initialSnakeLength; i++) addBodyPart();
 
     hideLostMessage();
   }
-  initialize();
+  initializeGame();
 
   //-------------------------------------------------------
   //---------- handling the snake ----------------------------
   //-------------------------------------------------------
   function addBodyPart() {
     var i = snake.length;
-    bodyPart = $('<div id="body-' + i + '" class="body-part"></div>').appendTo(container);
+    bodyPart = $('<div id="body-' + i + '" class="body-part"></div>').appendTo('#playing-field');
     bodyPart.css({
       width: blockSize,
       height: blockSize
@@ -133,8 +239,12 @@ $(function() {
       firstStar = false;
     }
     isMoving = true;
-    moveInterval = setInterval(moveSnake, tick);
+    moveInterval = setInterval(moveSnake, moveIntervalDuration());
     startDrawingStars();
+  }
+
+  function moveIntervalDuration() {
+    return tick*(1/speedFactor);
   }
 
   function stopMoving() {
@@ -177,7 +287,7 @@ $(function() {
   }
 
   //-------------------------------------------------------
-  //---------- menu on the left ---------------------------
+  //---------- menu on the right --------------------------
   //-------------------------------------------------------
   function showLostMessage() {
     $('#lost').css({visibility: 'visible'});
@@ -239,39 +349,28 @@ $(function() {
       } else {
         startMoving();
       }
-      e.preventDefault();
     }
     // start with arrows
-    if ([37, 38, 39, 40].indexOf(e.which) !== -1
-        && !isMoving
-        && !lostAlready){
-      startMoving();
+    if ([37, 38, 39, 40].indexOf(e.which) !== -1) {
+      if(!isMoving
+         && !lostAlready){
+        startMoving();
+      }
+      //Prevent the sliders to change
+      //when they have been selected before
+      e.preventDefault();
     }
   }
-  $(document).keydown(startAndStopSnake);
+  //this is not compatible with IE (prior 8?)
+  $(document).get(0).addEventListener('keydown', startAndStopSnake, true);
 
   function reinitialize(e) {
     if (lostAlready && e.which === 13)
-      initialize();
+      initializeGame();
   }
   $(document).keydown(reinitialize);
 
-  function setSpeed(e) {
-    if (e.which === 187) {
-      tick /= 2;
-    } else if (e.which === 189) {
-      tick *= 2;
-    }
-    if ((e.which === 187
-         || e.which === 189)
-      && isMoving) {
-      stopMoving();
-      startMoving();
-    }
-  }
-  $(document).keydown(setSpeed);
-
-  $('#retry').click(initialize);
+  $('#retry').click(initializeGame);
 
   //-------------------------------------------------------
   //---------- handling the stars -------------------------
@@ -293,16 +392,17 @@ $(function() {
     starRemoveTimeout = setTimeout(removeStar, keepStarTick());
   }
 
-  function drawStarTick() {
-    return tick * (gridSize.x + gridSize.y);
+  function drawStarDuration() {
+    //TODO when you increase the speed this seems to get to fast..
+    return moveIntervalDuration() * (gridSize.x + gridSize.y);
   }
 
   function keepStarTick() {
-    return drawStarTick() * 0.8;
+    return drawStarDuration() * 0.8;
   }
 
   function startDrawingStars() {
-    starInterval = setInterval(drawStar, drawStarTick());
+    starInterval = setInterval(drawStar, drawStarDuration());
   }
 
   function stopDrawingStars() {
@@ -311,7 +411,7 @@ $(function() {
   }
 
   function createStarContainer() {
-    starContainer = $('<div id="star-container"><span id="star">*</span></div>').appendTo($('#container'));
+    starContainer = $('<div id="star-container"><span id="star">*</span></div>').appendTo($('#playing-field'));
     starContainer.css({
       width: blockSize,
       height: blockSize,
@@ -368,5 +468,9 @@ $(function() {
     coordinates.top = element.css('top');
     coordinates.left = element.css('left');
     return coordinates;
+  }
+
+  function printValue(sourceElement, printElement) {
+    printElement.text(sourceElement.val());
   }
 });

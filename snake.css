@@ -13,12 +13,20 @@ body {
   padding: 20px;
 }
 
-#container {
+#playing-field-container {
+  position: relative;
+  flex: 0 0 720px;
+  height: 600px;
+}
+
+#playing-field {
   border: solid 1px #666666;
   border-radius: 4px;
   background-color: #DDDDDD;
   position: relative;
-  flex-shrink: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: auto;
 }
 
 .body-part {

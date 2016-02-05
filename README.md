@@ -14,8 +14,6 @@ You can increase (decrease) the speed with + (-).
 
 - Score.
 - Some refactorings
-- Sometimes a star gets drawn on the body. Maybe because it is drawn in
-  between the moving of two bodyparts.
 - Endless possibilities: special items to collect, a wall that works as
   a portal (you enter an the top and get back at the bottom), obstacles
-in the way, speed shifts, 2 player(!)
+in the way, 2 player(!)

@@ -163,10 +163,12 @@ $(function() {
 
     positionHead.x = initialPositionHead.x;
     while (positionHead.x >= gridSize.x) {
+      if (gridSize.x == 1) break;
       positionHead.x = Math.round(positionHead.x/2);
     }
     positionHead.y = initialPositionHead.y;
     while (positionHead.y >= gridSize.y) {
+      if (gridSize.y == 1) break;
       positionHead.y = Math.round(positionHead.y/2);
     }
     direction.x = initialDirection.x;

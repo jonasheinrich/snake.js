@@ -58,7 +58,8 @@ $(function() {
   initializeSettings();
 
   //TODO resizing and starting with a viewport different than mine does not work
-  //I could also do it with this:
+
+  //REFACTOR I could also do it with this:
   //http://stackoverflow.com/a/5926068
   //$(window).resize(initializeSettings);
 
@@ -361,7 +362,8 @@ $(function() {
       e.preventDefault();
     }
   }
-  //this is not compatible with IE (prior 8?)
+  //REFACTOR this is not compatible with IE (prior 8?)
+  //see also http://stackoverflow.com/a/17249184
   $(document).get(0).addEventListener('keydown', startAndStopSnake, true);
 
   function reinitialize(e) {

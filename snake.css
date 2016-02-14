@@ -62,6 +62,14 @@ body {
   text-align: center;
 }
 
-#settings-container {
+#left-column {
   width: 180px;
+}
+
+#navigation p {
+  text-align: justify;
+}
+
+h3, #output {
+  text-align: center;
 }

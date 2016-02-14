@@ -9,28 +9,40 @@
   <body>
     <div id='global-container'>
       <div id='settings-container'>
+        <h3>Navigation</h3>
+        <p>
+          Use the arrow keys to start and navigate and the space bar to pause/continue. When you change the size
+          of the block or the playing field or resize the screen the game gets restarted. But
+          you can adjust the speed during the game with + and -.
+        </p>
+        <h3>Settings</h3>
         <div id='playing-field-settings'>
-          <label for=grid-size-x-range>Grid size horizontically: </label>
-          <span id='grid-size-x-text'>12</span>
-          <input type="range" id="grid-size-x-range" data-textfield="#grid-size-x-text" min="5" max="20" value="12">
-          <label for=grid-size-y-range>Grid size vertically: </label>
-          <span id='grid-size-y-text'>10</span>
-          <input type="range" id="grid-size-y-range" data-textfield="#grid-size-y-text" min="5" max="20" value="10">
-          <label for=block-size-range>Block size: </label>
-          <span id='block-size-text'>60</span><span>px</span>
-          <input type="range" id="block-size-range" data-textfield="#block-size-text" min="10" max="100" value="60" step="10">
+          <div>
+            <label for=grid-size-x-range>Grid size horizontically </label>
+            <input type="range" id="grid-size-x-range" data-textfield="#grid-size-x-text" min="5" max="20" value="12">
+            <span id='grid-size-x-text'>12</span><br>
+          </div>
+          <div>
+            <label for=grid-size-y-range>Grid size vertically </label>
+            <input type="range" id="grid-size-y-range" data-textfield="#grid-size-y-text" min="5" max="20" value="10">
+            <span id='grid-size-y-text'>10</span>
+          </div>
+          <div>
+            <label for=block-size-range>Block size </label>
+            <input type="range" id="block-size-range" data-textfield="#block-size-text" min="10" max="100" value="60" step="10">
+            <span id='block-size-text'>60</span><span>px</span>
+          </div>
         </div>
         <label for=speed-range>Speed: </label>
-        <span id='speed-text'>1</span><span>x</span>
         <input type="range" id="speed-range" data-textfield="#speed-text" min="-5" max="5" value="0">
+        <span id='speed-text'>1</span><span>x</span>
       </div>
 
       <div id='playing-field-container'>
         <div id='playing-field'>
         </div>
       </div>
-      <div id='navigation'>
-        <p>Use the arrow keys to start and navigate and the space bar to pause/continue.</p>
+      <div id='output'>
         <div id='lost-container'>
           <div id="lost">Sorry, but you lost! <br> Hit Enter to restart or click here: <button id='retry'>Retry</button> </div>
       </div>

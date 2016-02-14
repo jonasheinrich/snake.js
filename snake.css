@@ -10,7 +10,7 @@ body {
   justify-content: center;
   align-items: center;
   display: flex;
-  padding: 20px;
+  padding: 10px;
 }
 
 #playing-field-container {
@@ -36,8 +36,8 @@ body {
   position: absolute;
 }
 
-#navigation {
-  width: 100px;
+#output {
+  width: 130px;
   padding: 0 0 0 10px;
 }
 
@@ -63,6 +63,5 @@ body {
 }
 
 #settings-container {
-  width: 140px;
-  padding: 0 10px 0 0;
+  width: 180px;
 }

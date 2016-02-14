@@ -49,7 +49,7 @@ $(function() {
 
   //REFACTOR I see no other way than defining the width
   //of the other elements plus some padding here
-  var marginX = 370;
+  var marginX = 400;
   var marginY = 60;
   function initializeSettings() {
     setMaxGridValues();

@@ -14,6 +14,7 @@ $(function() {
   var lostAlready;
   var steeredAlready;
   var firstStar;
+  var score;
 
   //Intervals and Timeouts
   var starFirstTimeout;
@@ -177,6 +178,8 @@ $(function() {
     lostAlready = false;
     firstStar = true;
     snake = [];
+    score = 0;
+    printScore();
 
     positionHead.x = initialPositionHead.x;
     while (positionHead.x >= gridSize.x) {
@@ -452,9 +455,25 @@ $(function() {
   function eatStar() {
     removeStar();
     addBodyPart();
+    updateScore();
+    printScore();
+
     clearInterval(starInterval);
     drawStar();
     startDrawingStars();
+  }
+
+  function updateScore() {
+    score += 100 * speedFactor;
+  }
+
+  function printScore() {
+    scoreElement = $('#score');
+    scoreElement.css({'color': 'red'});
+    scoreElement.text(score);
+    setTimeout(function() {
+      scoreElement.css({'color': 'black'});
+    }, 200);
   }
 
   //-------------------------------------------------------

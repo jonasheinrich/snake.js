@@ -47,21 +47,16 @@ $(function() {
   //---------- handling the settings ----------------------
   //-------------------------------------------------------
 
-  //TODO use the calculated width of the parent container
+  //REFACTOR I see no other way than defining the width
+  //of the other elements plus some padding here
   var marginX = 370;
-  var marginY = 50;
+  var marginY = 60;
   function initializeSettings() {
     setMaxGridValues();
 
-    setMaxBoxSizeValues();
+    setMaxBoxSizeValue();
   }
   initializeSettings();
-
-  //TODO resizing and starting with a viewport different than mine does not work
-
-  //REFACTOR I could also do it with this:
-  //http://stackoverflow.com/a/5926068
-  //$(window).resize(initializeSettings);
 
   function setMaxGridValues() {
     maxGridSizeX = maxGridSize(window.innerWidth, marginX);
@@ -70,15 +65,25 @@ $(function() {
     maxGridSizeY = maxGridSize(window.innerHeight, marginY);
     if (gridSize.y > maxGridSizeY) gridSize.y = maxGridSizeY;
     setMaxValue('#grid-size-y-range', maxGridSizeY);
+
+    updateSettingTexts();
   }
 
-  function setMaxBoxSizeValues() {
+  function setMaxBoxSizeValue() {
     maxBoxSize = getMaxBoxSize();
     setMaxValue('#block-size-range', maxBoxSize);
   }
 
   function maxGridSize(pixels, margin) {
     return Math.floor(maxPlayingFieldSize(pixels, margin) / blockSize);
+  }
+
+  function maxPlayingFieldSizeX() {
+    return window.innerWidth - marginX;
+  }
+
+  function maxPlayingFieldSizeY(pixels, margin) {
+    return window.innerHeight - marginY;
   }
 
   function maxPlayingFieldSize(pixels, margin) {
@@ -90,32 +95,33 @@ $(function() {
   }
 
   function getMaxBoxSize() {
-    return Math.floor(Math.min(maxPlayingFieldSize(window.innerWidth, marginX) / gridSize.x / 10,
-                               maxPlayingFieldSize(window.innerHeight, marginY) / gridSize.y / 10)) * 10;
+    return Math.floor(Math.min(maxPlayingFieldSizeX() / gridSize.x / 10,
+                               maxPlayingFieldSizeY() / gridSize.y / 10)) * 10;
   }
 
-  function setPlayingFieldSetting(settingInputElement) {
-    //REFACTOR there probably is a smarter way to do this
-    //maybe via a setting object and calling setting[this.data('setting')]?
-    if(settingInputElement.attr('id') === 'grid-size-x-range') {
-      gridSize.x = settingInputElement.val();
-      setMaxBoxSizeValues();
-    } else if (settingInputElement.attr('id') === 'grid-size-y-range') {
-      gridSize.y = settingInputElement.val();
-      setMaxBoxSizeValues();
-    } else if (settingInputElement.attr('id') === 'block-size-range') {
-      blockSize = settingInputElement.val();
-      setMaxGridValues();
-    }
+  function updateSettingTexts() {
+    $('#playing-field-settings').find('input[type=range]').each(function() {
+      printValue($(this), $($(this).data('textfield')));
+    });
+  }
 
+  function setPlayingFieldSetting() {
+    gridSize.x = $('#grid-size-x-range').val();
+    gridSize.y = $('#grid-size-y-range').val();
+    blockSize = $('#block-size-range').val();
+    setMaxGridValues();
+
+    drawPlayingFieldContainer();
     drawPlayingField();
     initializeGame();
   }
 
-  $('#playing-field-settings').find('input[type=range]').change(function() {
-    setPlayingFieldSetting($(this));
-    printValue($(this), $($(this).data('textfield')));
-  });
+  $('#playing-field-settings').find('input[type=range]').change(setPlayingFieldSetting);
+
+  //REFACTOR I could also do it with this:
+  //http://stackoverflow.com/a/5926068
+  $(window).resize(setPlayingFieldSetting);
+
 
   function setSpeedFactor() {
     var exponent = $(this).val();
@@ -144,6 +150,17 @@ $(function() {
   //-------------------------------------------------------
   //---------- setting up the game ------------------------
   //-------------------------------------------------------
+
+  function drawPlayingFieldContainer() {
+    var container = $('#playing-field-container');
+    width = maxPlayingFieldSizeX();
+    height = maxPlayingFieldSizeY();
+    container.css({
+      'flex-basis': width,
+      height: height
+    });
+  }
+  drawPlayingFieldContainer();
 
   function drawPlayingField() {
     var container = $('#playing-field');

@@ -37,8 +37,8 @@ body {
 }
 
 #navigation {
-  width: 20%;
-  padding: 20px;
+  width: 100px;
+  padding: 0 0 0 10px;
 }
 
 #body-0 {
@@ -61,4 +61,9 @@ body {
 
 #star {
   text-align: center;
+}
+
+#settings-container {
+  width: 140px;
+  padding: 0 10px 0 0;
 }

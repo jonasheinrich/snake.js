@@ -3,9 +3,7 @@ $(function() {
 
   //models
   var snake;
-  var star = {
-    active: false
-  };
+  var star = {};
 
   //states
   var positionHead = {};
@@ -411,7 +409,6 @@ $(function() {
     if (starContainer.length === 0) starContainer = createStarContainer();
     starContainer.css('visibility', 'visible');
     setCSSCoordinates(starContainer, gridToCSS(star));
-    star.active = true;
 
     starRemoveTimeout = setTimeout(removeStar, keepStarTick());
   }
@@ -448,7 +445,6 @@ $(function() {
   }
 
   function removeStar() {
-    star.active = false;
     starContainer.css({visibility: 'hidden'});
   }
 
